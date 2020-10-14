@@ -4,22 +4,28 @@
       <!-- -->
     </v-navigation-drawer>
 
-    <v-app-bar app>
+    <v-app-bar color="white" app elevation="0">
       <v-app-bar-nav-icon
         @click="isDrawerOpen = !isDrawerOpen"
       ></v-app-bar-nav-icon>
       <div class="d-flex">
         <v-icon>mdi-calendar</v-icon>
-        <span class="pl-2">Kalendarz</span>
+        <span class="pl-2">
+          <span style="color: purple">Bowskie's</span> Calendar</span
+        >
       </div>
       <v-row class="d-flex justify-space-between">
         <div class="d-flex align-center pl-12">
-          <v-btn class="mr-2" outlined small>Dzisiaj</v-btn>
+          <v-btn class="mr-2" outlined small @click="setToday()">Today</v-btn>
           <div class="pr-2">
-            <v-btn icon small><v-icon small>mdi-chevron-left</v-icon></v-btn>
-            <v-btn icon small><v-icon small>mdi-chevron-right</v-icon></v-btn>
+            <v-btn icon small @click="prev()"
+              ><v-icon small>mdi-chevron-left</v-icon></v-btn
+            >
+            <v-btn icon small @click="next()"
+              ><v-icon small>mdi-chevron-right</v-icon></v-btn
+            >
           </div>
-          <span>Październik 2020</span>
+          <span v-if="$refs.calendar">{{ $refs.calendar.title }}</span>
         </div>
 
         <div>
@@ -36,7 +42,7 @@
                 v-bind="attrs"
                 v-on="on"
               >
-                <span>Month</span>
+                <span>{{ typeToLabel[type] }}</span>
                 <v-icon right> mdi-menu-down </v-icon>
               </v-btn>
             </template>
@@ -63,12 +69,11 @@
     <!-- Sizes your content based upon application components -->
     <v-main>
       <!-- Provides the application the proper gutter -->
-      <v-container fluid> </v-container>
-    </v-main>
 
-    <v-footer app>
-      <!-- -->
-    </v-footer>
+      <v-sheet height="100%">
+        <v-calendar ref="calendar" v-model="focus" :type="type"></v-calendar>
+      </v-sheet>
+    </v-main>
   </v-app>
 </template>
 
@@ -80,7 +85,26 @@ export default {
 
   data: () => ({
     isDrawerOpen: false,
+    focus: "",
+    type: "month",
+    typeToLabel: {
+      month: "Month",
+      week: "Week",
+      day: "Day",
+      "4day": "4 Days",
+    },
     //
   }),
+  methods: {
+    prev() {
+      this.$refs.calendar.prev();
+    },
+    next() {
+      this.$refs.calendar.next();
+    },
+    setToday() {
+      this.focus = "";
+    },
+  },
 };
 </script>
