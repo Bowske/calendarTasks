@@ -17,6 +17,10 @@
       <v-row class="d-flex justify-space-between">
         <div class="d-flex align-center pl-12">
           <v-btn class="mr-2" outlined small @click="setToday()">Today</v-btn>
+          <v-btn class="mr-2" outlined small @click="addClass()"
+            >Add zajecie xd</v-btn
+          >
+
           <div class="pr-2">
             <v-btn icon small @click="prev()"
               ><v-icon small>mdi-chevron-left</v-icon></v-btn
@@ -29,6 +33,7 @@
         </div>
 
         <div>
+          <!-- <span v-if="$refs.calendar">{{ $refs.calendar.end }}</span> -->
           <v-btn icon small
             ><v-icon small>mdi-help-circle-outline</v-icon></v-btn
           >
@@ -71,13 +76,20 @@
       <!-- Provides the application the proper gutter -->
 
       <v-sheet height="100%">
-        <v-calendar ref="calendar" v-model="focus" :type="type"></v-calendar>
+        <v-calendar
+          :events="events"
+          ref="calendar"
+          v-model="focus"
+          :type="type"
+          end="2021-06-21"
+        ></v-calendar>
       </v-sheet>
     </v-main>
   </v-app>
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "App",
 
@@ -93,9 +105,40 @@ export default {
       day: "Day",
       "4day": "4 Days",
     },
+    events: [],
+
     //
   }),
   methods: {
+    addClass() {
+      const data = {
+        title: "ZajeciaTestowe",
+        description: "To opis",
+        day: 1,
+        hour: 13,
+        minute: 30,
+        additionalInfo: "Dodatkowe Info",
+      };
+      axios
+        .post("http://localhost:3001/zajecia", data)
+        .then((res) => {
+          for (let i of res.data) {
+            let tempDate = new Date(new Date(i.date).getTime());
+            this.events.push({
+              start: new Date(i.date)
+                .toISOString()
+                .substring(0, 16)
+                .replace("T", " "),
+              end: new Date(tempDate.setTime(tempDate.getTime() + 5400000))
+                .toISOString()
+                .substring(0, 16)
+                .replace("T", " "),
+              name: i.title,
+            });
+          }
+        })
+        .catch((err) => console.log(err));
+    },
     prev() {
       this.$refs.calendar.prev();
     },
